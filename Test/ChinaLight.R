@@ -4,7 +4,6 @@
 setwd("Documents/Programming/R/CoreConceptsR")
 source('R/field.R')
 source('R/object.R')
-source('R/granularity.R')
 
 setwd("~")
 setwd('Dropbox/ChinaLight')
