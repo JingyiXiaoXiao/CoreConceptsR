@@ -80,7 +80,7 @@ setDomain <- function(field, domain, sn){
       fld <- mask(x=fld , mask = domain)
     }
     else if(sn == "out"){
-      fld <- mask(x=field, mask = domain, updatevalue = FALSE)
+      fld <- mask(x=field, mask = domain, inverse = TRUE)
     }
       stop("Invalid domain data")
   }
