@@ -21,6 +21,8 @@ field <- function(x, domain = NULL, sn = NULL, granularity == NULL){
     fld <- setDomain(fld,domain,sn)
   if(!is.null(granularity))
     fld <- setGranularity(fld,granularity)
+  
+  return(fld)
 }
 
 
@@ -62,6 +64,7 @@ setValue <- function(field, qm = "index", var1, var2 = NULL, value){
 }
 
 # get a field's domain
+# for now
 domain <- function(field){
   return (rasterToPolygons(field))
 }
@@ -76,7 +79,9 @@ setDomain <- function(field, domain, sn){
       fld <- crop(field,extent(domain),snap=sn)
       fld <- mask(x=fld , mask = domain)
     }
-    else
+    else if(sn == "out"){
+      fld <- mask(x=field, mask = domain, updatevalue = FALSE)
+    }
       stop("Invalid domain data")
   }
   # else if(sn == "out"){
