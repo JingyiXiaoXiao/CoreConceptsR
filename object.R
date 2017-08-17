@@ -24,6 +24,8 @@ object <- function(foldername, filename){
 ## unit: buffer distance unit, support degree and meter, kilometer, feet, mile for now.
 # Return: buffered object
 buffer <- function(object, num, unit){
+  cr <- proj4string(object)
+  # crs to be updated
   repro <- spTransform(object, CRS("+init=epsg:3395"))
   if(unit == "degree")
     ####  very imprecise, depends on latitude. I used equator as standard now.
@@ -38,7 +40,7 @@ buffer <- function(object, num, unit){
     buf <- gBuffer(repro, width = num*1609.34, capStyle="ROUND")
   else
     stop("Invalid unit.")
-  return (spTransform(buf, CRS("+proj=longlat +datum=WGS84")))
+  return (spTransform(buf, CRS(cr)))
 }
 
 # bounds: return bounds of an object
@@ -50,7 +52,7 @@ bound <- function(object, type = "bb"){
   # return an extent object, like a boundingbox
   if(type == "bb")
     return(gEnvelope(object))
-  else if(type == 'ch')
+  else if(type == "ch")
     return(gConvexHull(object))
   else
     stop("Invalid type.")
@@ -81,25 +83,33 @@ identity <- function(object1, object2){
 # have to check relations many times
 relation <- function(object1, object2){
   if(gIntersects(object1,object2)){
-    if(gTouches(object1,object2)){
-      return("Touch")
-    }
-    else if(gCrosses(object1, object2)){
-      if(gOverlaps(object1,object2)){
-        if(gContains(object1,object2)){
-          if(gWithin(object1,object2))
-            return("Equal")
-          else return("Contain")
-        }
-        else if(gContains(object2,object1))
-          return("Within")
-        else return("Overlap")
-      }
-      else return("Cross")
-    }
+    rel <- "Intersect"
+    if(gTouches(object1,object2))
+      rel <- "Touch"
+    if(gCrosses(object1, object2))
+      rel <- "Cross"
+    if(gOverlaps(object1,object2))
+      rel <- "Overlap"
+    if(gContains(object1,object2))
+      rel <- "Contain"
+    if(gWithin(object1,object2))
+      rel <- "Within"
+    if(gEquals(object1, object2))
+      rel <- "Equal"
   }
-  else return("Disjoint")
+  else
+    rel <- "Disjoint"
+  
+  return(rel)
 }
 
+
+# more operations are needed:
+
+# we need the relation between objects, 
+# we also need operations to create objects based on current objects
+# for intance, an object is the overlap of two objects
+
+# calculate the distance between objects
 
 
